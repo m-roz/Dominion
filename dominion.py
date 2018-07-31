@@ -8,7 +8,7 @@ import card
 
 pygame.init()
 
-# Draw Screen
+# Screen
 screen_dimensions = (1920,1080)
 screen = pygame.display.set_mode(screen_dimensions)
 
@@ -17,7 +17,7 @@ pygame.display.set_caption('Dominion')
 screen_rect = screen.get_rect()
 
 background_color = (255, 255, 255)
-screen.fill(background_color)
+
 
 # All treasure cards.
 copper = card.TreasureCard('Copper', 0, 1)
@@ -26,130 +26,130 @@ gold = card.TreasureCard('Gold', 6, 3)
 
 treasure_piles = {'Copper': 46, 'Silver': 40, 'Gold': 30}
 
-# Draw treasure piles on screen.
+# Treasure pile images and locations on screen.
 copper_image = pygame.image.load("Images/Copper.jpg")
 copper_rect = copper_image.get_rect()
 copper_rect.left= screen_rect.left
 copper_rect.top = screen_rect.top
-screen.blit(copper_image, copper_rect)
+
 
 silver_image = pygame.image.load("Images/Silver.jpg")
 silver_rect = copper_image.get_rect()
 silver_rect.left= screen_rect.left
 silver_rect.top = copper_rect.bottom
-screen.blit(silver_image, silver_rect)
+
 
 gold_image = pygame.image.load("Images/Gold.jpg")
 gold_rect = gold_image.get_rect()
 gold_rect.left= screen_rect.left
 gold_rect.top = silver_rect.bottom
-screen.blit(gold_image, gold_rect)
+
 
 # All victory cards.
 estate = card.VictoryCard('Estate', 2, 1)
 duchy = card.VictoryCard('Duchy', 5, 3)
 province = card.VictoryCard('Province', 8, 6)
 
-# Draw victory piles on screen.
+# Victory pile images and locations on screen.
 estate_image = pygame.image.load("Images/Estate.jpg")
 estate_rect = estate_image.get_rect()
 estate_rect.left = copper_rect.right
 estate_rect.top = screen_rect.top
-screen.blit(estate_image, estate_rect)
+
 
 duchy_image = pygame.image.load("Images/Duchy.jpg")
 duchy_rect = duchy_image.get_rect()
 duchy_rect.left= estate_rect.left 
 duchy_rect.top = estate_rect.bottom
-screen.blit(duchy_image, duchy_rect)
+
 
 province_image = pygame.image.load("Images/Province.jpg")
 province_rect = province_image.get_rect()
 province_rect.left = estate_rect.left 
 province_rect.top = duchy_rect.bottom
-screen.blit(province_image, province_rect)
+
 
 # Curse card.
 curse = card.CurseCard('Curse', 0, -1)    
 
 victory_piles = {'Estate': 8, 'Duchy': 8, 'Province': 8, 'Curse': 10}
 
-# Draw curse pile on screen.
+# Curse pile image and location on screen.
 curse_image = pygame.image.load("Images/Curse.jpg")
 curse_rect = curse_image.get_rect()
 curse_rect.left = estate_rect.left 
 curse_rect.top = province_rect.bottom
-screen.blit(curse_image, curse_rect)
+
 
 village = card.ActionCard('Village', 3)
 woodcutter = card.ActionCard('Woodcutter', 3)
 smithy = card.ActionCard('Smithy', 4)
 market = card.ActionCard('Market', 5)
 
-action_piles = {'Village': 1, 'Woodcutter': 1, 'Smithy': 1, 'Market': 8}
+action_piles = {'Village': 10, 'Woodcutter': 10, 'Smithy': 10, 'Market': 10}
 
-# Draw kingdom piles on screen.
+# Action pile images and locations on screen.
 cellar_image = pygame.image.load("Images/Cellar.jpg")
 cellar_rect = cellar_image.get_rect()
 cellar_rect.left = estate_rect.right
 cellar_rect.top = screen_rect.top
-screen.blit(cellar_image, cellar_rect)
+
 
 moat_image = pygame.image.load("Images/Moat.jpg")
 moat_rect = moat_image.get_rect()
 moat_rect.left= estate_rect.right 
 moat_rect.top = cellar_rect.bottom
-screen.blit(moat_image, moat_rect)
+
 
 village_image = pygame.image.load("Images/Village.jpg")
 village_rect = village_image.get_rect()
 village_rect.left = estate_rect.right 
 village_rect.top = moat_rect.bottom
-screen.blit(village_image, village_rect)
+
 
 workshop_image = pygame.image.load("Images/Workshop.jpg")
 workshop_rect = workshop_image.get_rect()
 workshop_rect.left = estate_rect.right 
 workshop_rect.top = village_rect.bottom
-screen.blit(workshop_image, workshop_rect)
+
 
 woodcutter_image = pygame.image.load("Images/Woodcutter.jpg")
 woodcutter_rect = woodcutter_image.get_rect()
 woodcutter_rect.left = estate_rect.right 
 woodcutter_rect.top = workshop_rect.bottom
-screen.blit(woodcutter_image, woodcutter_rect)
+
 
 smithy_image = pygame.image.load("Images/Smithy.jpg")
 smithy_rect = smithy_image.get_rect()
 smithy_rect.left = estate_rect.right 
 smithy_rect.top = woodcutter_rect.bottom
-screen.blit(smithy_image, smithy_rect)
+
 
 remodel_image = pygame.image.load("Images/Remodel.jpg")
 remodel_rect = remodel_image.get_rect()
 remodel_rect.left = estate_rect.right 
 remodel_rect.top = smithy_rect.bottom
-screen.blit(remodel_image, remodel_rect)
+
 
 militia_image = pygame.image.load("Images/Militia.jpg")
 militia_rect = militia_image.get_rect()
 militia_rect.left = estate_rect.right 
 militia_rect.top = remodel_rect.bottom
-screen.blit(militia_image, militia_rect)
+
 
 market_image = pygame.image.load("Images/Market.jpg")
 market_rect = market_image.get_rect()
 market_rect.left = estate_rect.right 
 market_rect.top = militia_rect.bottom
-screen.blit(market_image, market_rect)
+
 
 mine_image = pygame.image.load("Images/Mine.jpg")
 mine_rect = mine_image.get_rect()
 mine_rect.left = estate_rect.right 
 mine_rect.top = market_rect.bottom
-screen.blit(mine_image, mine_rect)
 
-# Draw Done button.
+
+# Done button image and location on screen.
 x_coordinate = 1300
 y_coordinate = duchy_rect.bottom
 msg = "Done"
@@ -159,7 +159,6 @@ f = pygame.font.SysFont(None, 48)
 done_image = f.render(msg, True, msg_color, bg_color)
 done_box_rect = done_image.get_rect()
 done_box_rect.topleft = (x_coordinate,y_coordinate)
-screen.blit(done_image, done_box_rect)
 
 
 # Create players.
@@ -182,19 +181,51 @@ game_over = False
 player1.y = silver_rect.top
 player2.y = curse_rect.top
 
+current_phase = "Action Phase"
+
 def print_game_info():
     """Prints relevant game info for current player."""
-        print("\n", player.name, "\n")
-        print("Actions:", player.num_actions)
-        print("Buys:", player.num_buys)
-        print("$:", player.num_coins, "\n")
+    print("\n", player.name, "\n")
+    print(current_phase)
+    print("Actions:", player.num_actions)
+    print("Buys:", player.num_buys)
+    print("$:", player.num_coins, "\n")
         
-        for pile,num in list(
-        treasure_piles.items()) + list(
-        victory_piles.items()) + list(
-        action_piles.items()):
-            print(pile,":", num)
-        
+    for pile,num in list(
+    treasure_piles.items()) + list(
+    victory_piles.items()) + list(
+    action_piles.items()):
+        print(pile,":", num)
+
+    # Use to check.
+    # ~ print("hand:",player.hand)
+    # ~ print("deck:",player.deck)
+    # ~ print("discard pile:",player.discard_pile)
+    # ~ print("played_cards:",player.played_cards)
+    
+def draw_screen():
+    """Draws screen background, supply piles, and done button on screen.""" 
+    screen.fill(background_color)
+    screen.blit(copper_image, copper_rect)
+    screen.blit(silver_image, silver_rect)
+    screen.blit(gold_image, gold_rect)
+    screen.blit(estate_image, estate_rect)
+    screen.blit(duchy_image, duchy_rect)
+    screen.blit(province_image, province_rect)
+    screen.blit(curse_image, curse_rect)
+    screen.blit(cellar_image, cellar_rect)
+    screen.blit(moat_image, moat_rect)
+    screen.blit(village_image, village_rect)
+    screen.blit(workshop_image, workshop_rect)
+    screen.blit(woodcutter_image, woodcutter_rect)
+    screen.blit(smithy_image, smithy_rect)
+    screen.blit(remodel_image, remodel_rect)
+    screen.blit(militia_image, militia_rect)
+    screen.blit(market_image, market_rect)
+    screen.blit(mine_image, mine_rect)
+    screen.blit(done_image, done_box_rect)
+
+
 def draw_hand(player):
         """Draw player hand on screen."""
         # Probably has to be redone. 
@@ -214,9 +245,12 @@ def draw_hand(player):
             player.x += rect.width
         
         return hand_rects
-        
+
+draw_screen()
+
 for player in players:
     draw_hand(player)
+    
 
 # Main loop.
 while not game_over:
@@ -230,6 +264,7 @@ while not game_over:
         # Begin the buy phase.
         action_phase = True
         buy_phase = False
+        current_phase = "Action Phase"
         
         while buy_phase or action_phase:
             # Get mouse position.
@@ -243,6 +278,7 @@ while not game_over:
                         if done_box_rect.collidepoint(mouse_pos):
                             action_phase = False
                             buy_phase = True
+                            current_phase = "Buy Phase"
                         else:
                             if player.num_actions > 0:
                                 # Play actions.
@@ -253,7 +289,6 @@ while not game_over:
                                             card.play_action(player)
                                             player.hand.remove(card)
                                             player.played_cards.append(card)
-                                            card.play_action(player)
                     else:
                         if done_box_rect.collidepoint(mouse_pos):
                             buy_phase = False
@@ -294,7 +329,9 @@ while not game_over:
                                 elif market_rect.collidepoint(mouse_pos):
                                     player.buy_card(market, action_piles)
                                     
-                    hand_rects = draw_hand(player)            
+                    draw_screen()              
+                    hand_rects = draw_hand(player) 
+                    
                     pygame.display.flip()
                     print_game_info()
                     
