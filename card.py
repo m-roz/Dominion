@@ -4,7 +4,7 @@ class Card():
     def __init__(self, name, cost):
         self.name = name
         self.cost = cost
-        
+
 class TreasureCard(Card):
     def __init__(self, name, cost, value):
         super().__init__(name, cost)
@@ -29,6 +29,7 @@ class CurseCard(VictoryCard):
 
 # Create increase actions, increase coins, and increase buys classes so 
 # printing is automatically done when the actions are played?
+# Move to player class?
 class ActionCard(Card):
     def __init__(self, name, cost):
         super().__init__(name, cost)
@@ -37,10 +38,16 @@ class ActionCard(Card):
     def play_action(self, player):
         print(player.name, "plays", self.name)
         player.num_actions -= 1
-        if self.name == 'Village':
+        if self.name == 'Cellar':
+            player.num_actions += 1
+            #discard cards...
+        elif self.name == 'Village':
             player.draw(1)
             player.num_actions += 1
             print("+1 Actions")
+        elif self.name == 'Workshop':
+            pass
+            # Gain card costing up to 4 coins
         elif self.name == 'Woodcutter':
             player.num_buys +=1
             player.num_coins += 2  

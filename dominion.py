@@ -80,13 +80,13 @@ curse_rect = curse_image.get_rect()
 curse_rect.left = estate_rect.left 
 curse_rect.top = province_rect.bottom
 
-
+cellar = card.ActionCard('Cellar', 2)
 village = card.ActionCard('Village', 3)
 woodcutter = card.ActionCard('Woodcutter', 3)
 smithy = card.ActionCard('Smithy', 4)
 market = card.ActionCard('Market', 5)
 
-action_piles = {'Village': 10, 'Woodcutter': 10, 'Smithy': 10, 'Market': 10}
+action_piles = {'Cellar':10, 'Village': 10, 'Woodcutter': 10, 'Smithy': 10, 'Market': 10}
 
 # Action pile images and locations on screen.
 cellar_image = pygame.image.load("Images/Cellar.jpg")
@@ -183,13 +183,18 @@ player2.y = curse_rect.top
 
 current_phase = "Action Phase"
 
+def get_type(card):
+    """Returns card type."""
+    # Might be unnecessary
+    return card.type 
+
 def print_game_info():
     """Prints relevant game info for current player."""
     print("\n", player.name, "\n")
     print(current_phase)
     print("Actions:", player.num_actions)
     print("Buys:", player.num_buys)
-    print("$:", player.num_coins, "\n")
+    print("$", player.num_coins, "\n")
         
     for pile,num in list(
     treasure_piles.items()) + list(
@@ -259,14 +264,28 @@ while not game_over:
         pygame.display.flip()
         # Start turn.
         player.turn += 1
-        print("\n", player.name, "\n")
+        print("\n", player.name, "Turn", player.turn, "\n")
 
         # Begin the buy phase.
         action_phase = True
         buy_phase = False
         current_phase = "Action Phase"
-        
+
         while buy_phase or action_phase:
+            if action_phase:
+                # Skips action phase if no action cards in hand 
+                # or no action points.
+                if player.hand[0].type != 'Action' or player.num_actions == 0:
+                    action_phase = False
+                    buy_phase = True
+                    current_phase = "Buy Phase"
+            if buy_phase:
+                # Skips buy phase if no buy points.
+                if player.num_buys == 0:
+                    buy_phase = False
+                    player.clean_up()
+                    draw_hand(player)
+                    
             # Get mouse position.
             mouse_pos = pygame.mouse.get_pos()
             # Respond to mouse clicks.
@@ -320,6 +339,8 @@ while not game_over:
                                     player.buy_card(province, victory_piles)
                                 elif curse_rect.collidepoint(mouse_pos):
                                     player.buy_card(curse, victory_piles)
+                                elif cellar_rect.collidepoint(mouse_pos):
+                                    player.buy_card(cellar, action_piles)
                                 elif village_rect.collidepoint(mouse_pos):
                                     player.buy_card(village, action_piles)
                                 elif woodcutter_rect.collidepoint(mouse_pos):
@@ -336,13 +357,22 @@ while not game_over:
                     print_game_info()
                     
         # Check for game over.
+        # Game ends when either the supply pile of province cards is empty or
+        # any 3 supply piles are empty.
+        
         # Needs a better way to keep track of empty piles
-        # instead of reseting every check.
+        # instead of reseting every check. 
         num_empty_piles = 0
         for pile in action_piles.values():
             if pile == 0:
                 num_empty_piles += 1
-                
+        for pile in treasure_piles.values():
+            if pile == 0:
+                num_empty_piles += 1
+        for pile in victory_piles.values():
+            if pile == 0:
+                num_empty_piles += 1
+      
         if num_empty_piles >= 3 or victory_piles['Province'] == 0:
             game_over = True
             break

@@ -29,12 +29,18 @@ class Player():
         for card in range(num):
             # Shuffle discard pile into deck if deck is empty.
             if not self.deck:
-                self.shuffle_deck()
-                print(self.name, "shuffles.")
+                # If player does not have enough cards left to draw
+                # after forming a new deck, draw as many as he can.
+                if self.discard_pile:
+                    self.shuffle_deck()
+                    print(self.name, "shuffles.")
+                else:
+                    print("No more cards to draw.")
+                    break
             new_card = self.deck.pop()
             self.hand.append(new_card)
             print(self.name, "draws a", new_card.name)
-            
+
         # Sort hand by type and cost.
         def get_cost(card):
             return card.cost
@@ -46,7 +52,10 @@ class Player():
         self.hand.sort(key=get_type)
         
     def clean_up(self):
-        """Clean up phase at the end of the turn."""
+        """Clean up phase at the end of the turn. 
+        Player places all cards played this turn and 
+        all remaining cards in hand into discard pile. 
+        Player then draws a new hand of 5 cards and ends his turn."""
         self.discard_pile.extend(self.played_cards + self.hand)
         self.played_cards = []
         self.hand = []
@@ -67,5 +76,17 @@ class Player():
         else:
             print("No more", card.name, "cards.")
 
-    # ~ def discard_card(self, card):
-        # ~ """Discard a card from player's hand."""
+    def gain_card(self, card, supply_piles):
+        """Gain a card from a non-empty supply pile."""
+        if supply_piles[card.name] > 0:
+            self.discard_pile.append(card)
+            supply_piles[card.name] -= 1
+    
+    def discard_card(self, card):
+        """Discard a card from player's hand."""
+        self.hand.remove(card)
+        self.discard_pile.append(card)
+
+    def trash_card(self,card):
+        """Trash a card from player's hand."""
+        self.hand.remove(card)
