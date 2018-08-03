@@ -7,9 +7,3 @@ Uses the starting "first game" kingdom cards from dominion rulebook. All card im
 All information regarding the active player and supply piles printed to console after every click. 
 
 Should be able to finish a game with just the 4 working action cards.
-
-
-
--Main bug is that cards are not properly removed from hand when played.
-A new card is drawn to the screen each time but does not appear in the player's actual card list.
-FIXED in second commit by creating dedicated function to re-fill and re-draw screen after every click.
