@@ -160,7 +160,6 @@ done_image = f.render(msg, True, msg_color, bg_color)
 done_box_rect = done_image.get_rect()
 done_box_rect.topleft = (x_coordinate,y_coordinate)
 
-
 # Create players.
 player1 = Player('Player1')
 player2 = Player('Player2')
@@ -172,7 +171,7 @@ for player in players:
     player.shuffle_deck()
     player.draw(5)
     
-# Trash pile.
+# Trash pile. PLayers should be able to look in trash pile.
 trash_pile = []
 
 game_over = False
@@ -180,6 +179,12 @@ game_over = False
 # Player hand y-coordinates.
 player1.y = silver_rect.top
 player2.y = curse_rect.top
+
+# Play_coins button image and location on screen
+msg2 = "+$" + str(player1.get_num_coins_in_hand())
+play_coins_image = f.render(msg2, True, msg_color, bg_color)
+play_coins_box_rect = play_coins_image.get_rect()
+play_coins_box_rect.topleft = (1200,duchy_rect.bottom)
 
 current_phase = "Action Phase"
 
@@ -195,7 +200,8 @@ def print_game_info():
     print("Actions:", player.num_actions)
     print("Buys:", player.num_buys)
     print("$", player.num_coins, "\n")
-        
+    # Number of cards in deck should only be visible to player.
+    print("Deck:", len(player.deck), "cards \n")
     for pile,num in list(
     treasure_piles.items()) + list(
     victory_piles.items()) + list(
@@ -229,7 +235,7 @@ def draw_screen():
     screen.blit(market_image, market_rect)
     screen.blit(mine_image, mine_rect)
     screen.blit(done_image, done_box_rect)
-
+    screen.blit(play_coins_image, play_coins_box_rect)
 
 def draw_hand(player):
         """Draw player hand on screen."""
@@ -286,6 +292,7 @@ while not game_over:
                     player.clean_up()
                     draw_hand(player)
                     
+            
             # Get mouse position.
             mouse_pos = pygame.mouse.get_pos()
             # Respond to mouse clicks.
@@ -315,11 +322,15 @@ while not game_over:
                             draw_hand(player)
                         else:
                             if player.num_buys > 0:
-                                # Play coins.
+                                # Play all coins at once.
+                                if play_coins_box_rect.collidepoint(mouse_pos):
+                                    player.play_all_coins()
+                                # Play coins individually.
                                 for card, card_rect in zip(
                                 player.hand, hand_rects):
                                     if card_rect.collidepoint(mouse_pos):
                                         if card.type == 'Treasure':
+                                            print(player.name, "plays a", card.name)
                                             player.num_coins += card.value
                                             player.hand.remove(card)
                                             player.played_cards.append(card)
@@ -349,13 +360,21 @@ while not game_over:
                                     player.buy_card(smithy, action_piles)
                                 elif market_rect.collidepoint(mouse_pos):
                                     player.buy_card(market, action_piles)
-                                    
-                    draw_screen()              
-                    hand_rects = draw_hand(player) 
-                    
-                    pygame.display.flip()
                     print_game_info()
                     
+                # Update play_coins box. 
+                msg2 = "+$"+ str(player.get_num_coins_in_hand())
+                play_coins_image = f.render(msg2, True, msg_color, bg_color)
+                play_coins_box_rect = play_coins_image.get_rect()
+                play_coins_box_rect.topleft = (1200,duchy_rect.bottom)
+     
+                # Update screen.
+                draw_screen() 
+                hand_rects = draw_hand(player) 
+                screen.blit(play_coins_image, play_coins_box_rect)
+                pygame.display.flip()
+                
+
         # Check for game over.
         # Game ends when either the supply pile of province cards is empty or
         # any 3 supply piles are empty.

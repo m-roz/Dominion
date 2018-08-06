@@ -90,3 +90,21 @@ class Player():
     def trash_card(self,card):
         """Trash a card from player's hand."""
         self.hand.remove(card)
+
+    def get_num_coins_in_hand(self):
+        """Gets the value of the coins in player's hand."""
+        coins_in_hand = 0
+        for card in self.hand:
+            if card.type == 'Treasure':
+                coins_in_hand += card.value
+        return coins_in_hand
+        
+    def play_all_coins(self):
+        """Plays every coin in player's hand at once."""
+        for card in self.hand[:]:
+            if card.type == 'Treasure':
+                print(self.hand)
+                print(self.name, "plays", card.name)
+                self.num_coins += card.value
+                self.hand.remove(card)
+                self.played_cards.append(card)

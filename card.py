@@ -35,6 +35,7 @@ class ActionCard(Card):
         super().__init__(name, cost)
         self.type = 'Action'
     
+    # Card effects should be resolved in turn order.
     def play_action(self, player):
         print(player.name, "plays", self.name)
         player.num_actions -= 1
