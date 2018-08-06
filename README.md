@@ -8,3 +8,18 @@ Uses the starting "first game" kingdom cards from dominion rulebook. All card im
 All information regarding the active player and supply piles printed to console after every click. 
 
 Should be able to finish a game with just the 4 working action cards.
+
+Changelog:
+Commit 1
+-Basic two player game of dominion with village, woodcutter, smithy, and market action cards working.
+
+Commit 2
+-Fixed screen updating of player hand after a card is played.
+-Only current player's hand visible on screen.
+
+Commit 3
+-Automatic phase and turn end without 'Done' button being pressed.
+
+Commit 4
+-Added '+$' button to play all coins in player's hand at once.
+-Screen is updated continuously at the end of every loop instead of after the mouse is clicked.
