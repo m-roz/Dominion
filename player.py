@@ -8,6 +8,7 @@ class Player():
         self.name = name
         self.deck = []
         self.hand = []
+        # ~ self.hand_rects = []
         self.discard_pile = []
         self.played_cards = []
         self.num_actions = 1
@@ -15,6 +16,8 @@ class Player():
         self.num_coins = 0
         self.victory_points = 0
         self.turn = 0
+        self.action_phase = False
+        self.buy_phase = False
         self.x = 0
         self.y = 0
         
@@ -83,28 +86,32 @@ class Player():
             supply_piles[card.name] -= 1
     
     def discard_card(self, card):
-        """Discard a card from player's hand."""
+        """Discard a card from hand."""
         self.hand.remove(card)
         self.discard_pile.append(card)
 
     def trash_card(self,card):
-        """Trash a card from player's hand."""
+        """Trash a card from hand."""
+        # Needs to go to trash pile
         self.hand.remove(card)
 
     def get_num_coins_in_hand(self):
-        """Gets the value of the coins in player's hand."""
+        """Gets the value of the coins in hand."""
         coins_in_hand = 0
         for card in self.hand:
             if card.type == 'Treasure':
                 coins_in_hand += card.value
         return coins_in_hand
         
+    def play_coin(self, card):
+        """Play coin from hand."""
+        print(self.name, "plays a", card.name)
+        self.num_coins += card.value
+        self.hand.remove(card)
+        self.played_cards.append(card)
+        
     def play_all_coins(self):
-        """Plays every coin in player's hand at once."""
+        """Plays every coin in hand at once."""
         for card in self.hand[:]:
             if card.type == 'Treasure':
-                print(self.hand)
-                print(self.name, "plays", card.name)
-                self.num_coins += card.value
-                self.hand.remove(card)
-                self.played_cards.append(card)
+                self.play_coin(card)
