@@ -35,7 +35,7 @@ curse = card.CurseCard('Curse', 0, -1)
 victory_cards = [estate, duchy, province, curse]
 victory_piles = {}
 for victory_card in victory_cards:
-    victory_piles[victory_card.name] = 1
+    victory_piles[victory_card.name] = 8
 victory_piles['Curse'] = 10
 
 
@@ -207,4 +207,4 @@ while not game_over:
             break
 
 print("Game Over")
-gf.determine_winner(players,player1, player2)
+gf.determine_winner(players)
