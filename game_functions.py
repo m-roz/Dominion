@@ -2,6 +2,8 @@ import sys
 
 import pygame
 
+from player import Player 
+
 def check_events(player, cards, supply_piles, done_rect, play_coins_rect):
     """Respond to mouse events."""
     # Get mouse position
@@ -111,3 +113,48 @@ def determine_winner(players, player1, player2):
         print(player1.name, "is the winner!")
     elif player1.victory_points < player2.victory_points:
         print(player2.name, "is the winner!")
+
+
+def determine_winner(players):
+    """Determine winner at the end of the game."""
+    for player in players:
+        # Counts victory points in each player's deck
+        player.deck.extend(player.discard_pile + player.hand)
+        player.hand = []
+        player.discard_pile = []
+        for card in player.deck:
+            if card.type == 'Victory' or card.type == 'Curse':
+                player.victory_points += card.point_value
+        
+        # Sorts players by most victory points and fewest turns
+        def get_turns(player):
+            return player.turn
+        def get_victory_points(player):
+            return player.victory_points
+        players.sort(key=get_turns)
+        players.sort(key=get_victory_points, reverse=True)
+        
+        # If multiple players share the highest score and fewest turns
+        scores = list(player.victory_points for player in players)
+        max_score = max(scores)
+        count = scores.count(max_score)
+        if count > 1:
+            tied_players = players[0:count]
+            turns = list(player.turn for player in tied_players)
+            min_turns = min(turns)
+            count = turns.count(min_turns)
+            if count > 1:
+                tied_players = tied_players[0:count]
+        
+        winner = players[0]
+    
+    if count > 1:
+        # If tie
+        print("Tie game", list(player.name for player in tied_players))
+    else:
+        # If single winner
+        print(winner.name, "is the winner!")
+        
+    # Prints players and scores in order of victory
+    for player in players:
+        print(player.name, "has", player.victory_points, "victory points")

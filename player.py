@@ -8,7 +8,7 @@ class Player():
         self.name = name
         self.deck = []
         self.hand = []
-        # ~ self.hand_rects = []
+        self.hand_rects = []
         self.discard_pile = []
         self.played_cards = []
         self.num_actions = 1

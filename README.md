@@ -28,3 +28,6 @@ Commit 5
 -Refactored code
 -Added game_functions.py module
 -Both players' hands always visible on screen
+
+Commit 6
+-Updated function to determine the winner at the end of a game
