@@ -9,6 +9,8 @@ All information regarding the active player and supply piles is printed to the c
 
 Should be able to finish a game with just the 4 working action cards.
 
+To play, launch Dominion.py
+
 Changelog:
 Commit 1
 -Basic two player game of dominion with village, woodcutter, smithy, and market action cards working.
@@ -31,3 +33,6 @@ Commit 5
 
 Commit 6
 -Updated function to determine the winner at the end of a game
+
+Commit 7
+-Moved code to update screen into game_functions.py

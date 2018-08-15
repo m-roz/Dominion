@@ -158,3 +158,59 @@ def determine_winner(players):
     # Prints players and scores in order of victory
     for player in players:
         print(player.name, "has", player.victory_points, "victory points")
+
+
+def blit_treasure_piles(screen, treasure_cards):
+    """Draw treasure piles on screen."""
+    y_location = 0
+    for card in treasure_cards:
+        card.rect.x = 0
+        card.rect.y = y_location
+        screen.blit(card.image, card.rect)
+        y_location += card.rect.height
+    
+def blit_victory_piles(screen, victory_cards):
+    """Draw victory piles on screen."""
+    y_location = 0
+    for card in victory_cards:
+        card.rect.x = card.rect.width
+        card.rect.y = y_location
+        screen.blit(card.image, card.rect)
+        y_location += card.rect.height
+
+def blit_action_piles(screen, action_cards):
+    """Draw action piles on screen."""
+    y_location = 0
+    for card in action_cards:
+        card.rect.x = 2*card.rect.width
+        card.rect.y = y_location
+        screen.blit(card.image, card.rect)
+        y_location += card.rect.height
+        
+def blit_hands(screen, players):
+    """Draw player hands on screen."""
+    for player in players:
+        player.x = 600
+        player.hand_rects = []
+        for card in player.hand:
+            hand_rect = card.image.get_rect()
+            hand_rect.x = player.x
+            hand_rect.y = player.y
+            player.hand_rects.append(hand_rect)
+            screen.blit(card.image, hand_rect)
+            player.x += card.rect.width
+                
+
+def update_screen(screen, background_color, treasure_cards, victory_cards, action_cards, players, done_image, done_rect, play_coins_image, play_coins_rect):
+    """Update images on the screen and flip to the new screen."""
+    # Draws background, supply piles, hands, and buttons on screen
+    screen.fill(background_color)
+    blit_treasure_piles(screen, treasure_cards)
+    blit_victory_piles(screen, victory_cards)
+    blit_action_piles(screen, action_cards)
+    blit_hands(screen, players)
+    screen.blit(done_image, done_rect)
+    screen.blit(play_coins_image, play_coins_rect)
+    
+    # Makes the most recently drawn screen visible
+    pygame.display.flip()

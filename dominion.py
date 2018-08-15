@@ -57,33 +57,6 @@ action_piles = {}
 for action_card in action_cards:
     action_piles[action_card.name] = 10
 
-
-def blit_treasure_piles():
-    """Blit treasure piles on screen."""
-    y_location = screen_rect.top
-    for card in treasure_cards:
-        card.rect.x = 0
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height
-    
-def blit_victory_piles():
-    """Blit victory piles on screen."""
-    y_location = screen_rect.top
-    for card in victory_cards:
-        card.rect.x = card.rect.width
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height
-
-def blit_action_piles():
-    """Blit action piles on screen."""
-    y_location = screen_rect.top
-    for card in action_cards:
-        card.rect.x = 2*card.rect.width
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height
         
 # All cards in game and corresponding supply piles
 cards = treasure_cards + victory_cards + action_cards 
@@ -133,35 +106,13 @@ game_over = False
 player1.y = copper.rect.height
 player2.y = 3*copper.rect.height
 
-def blit_hands(players):
-        """Blit player hands on screen."""
-        for player in players:
-            player.x = 600
-            player.hand_rects = []
-            for card in player.hand:
-                hand_rect = card.image.get_rect()
-                hand_rect.x = player.x
-                hand_rect.y = player.y
-                player.hand_rects.append(hand_rect)
-                screen.blit(card.image, hand_rect)
-                player.x += card.rect.width
-
-# Move to game_functions.py
-def update_screen():
-    """Draws background, supply piles, hands, and buttons on screen.""" 
-    screen.fill(background_color)
-    blit_treasure_piles()
-    blit_victory_piles()
-    blit_action_piles()
-    blit_hands(players)
-    screen.blit(done_image, done_rect)
-    screen.blit(play_coins_image, play_coins_rect)
-    pygame.display.flip()
-
 # Main loop
 while not game_over:
     for player in players:
-        update_screen()
+        gf.update_screen(screen, background_color, treasure_cards, 
+                        victory_cards, action_cards, players, done_image, 
+                        done_rect, play_coins_image, play_coins_rect)
+                        
         # Start turn
         player.turn += 1
         print("\n", player.name, "Turn", player.turn, "\n")
@@ -196,9 +147,9 @@ while not game_over:
             play_coins_rect.x = 1200
             play_coins_rect.y = 160
             
-            update_screen()
-            
-            
+            gf.update_screen(screen, background_color, treasure_cards,
+                            victory_cards, action_cards, players, done_image, 
+                            done_rect, play_coins_image, play_coins_rect)
                     
 
         # Check for game over.
