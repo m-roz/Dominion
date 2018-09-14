@@ -8,7 +8,10 @@ class Card():
         self.cost = cost
         self.image = pygame.image.load("Images/" + self.name + ".jpg")
         self.rect = self.image.get_rect()
-
+        
+        self.info_box_image = pygame.Surface((100,100))
+        self.info_box_rect = self.info_box_image.get_rect()
+        
 class TreasureCard(Card):
     def __init__(self, name, cost, value):
         super().__init__(name, cost)

@@ -110,7 +110,7 @@ player2.y = 3*copper.rect.height
 while not game_over:
     for player in players:
         gf.update_screen(screen, background_color, treasure_cards, 
-                        victory_cards, action_cards, players, done_image, 
+                        victory_cards, action_cards, supply_piles, players, done_image, 
                         done_rect, play_coins_image, play_coins_rect)
                         
         # Start turn
@@ -148,7 +148,7 @@ while not game_over:
             play_coins_rect.y = 160
             
             gf.update_screen(screen, background_color, treasure_cards,
-                            victory_cards, action_cards, players, done_image, 
+                            victory_cards, action_cards, supply_piles, players, done_image, 
                             done_rect, play_coins_image, play_coins_rect)
                     
 
