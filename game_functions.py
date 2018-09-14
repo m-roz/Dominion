@@ -4,7 +4,7 @@ import pygame
 
 from player import Player 
 
-def check_events(player, cards, supply_piles, done_rect, play_coins_rect):
+def check_events(player, cards, supply_piles, done_button, coins_button):
     """Respond to mouse events."""
     # Get mouse position
     mouse_pos = pygame.mouse.get_pos()
@@ -14,7 +14,7 @@ def check_events(player, cards, supply_piles, done_rect, play_coins_rect):
             sys.exit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if player.action_phase:
-                if done_rect.collidepoint(mouse_pos):
+                if done_button.rect.collidepoint(mouse_pos):
                     player.action_phase = False
                     player.buy_phase = True
                 else:
@@ -26,13 +26,13 @@ def check_events(player, cards, supply_piles, done_rect, play_coins_rect):
                                 if card.type == 'Action':
                                     card.play_action(player)
             else:
-                if done_rect.collidepoint(mouse_pos):
+                if done_button.rect.collidepoint(mouse_pos):
                     player.buy_phase = False
                     player.clean_up()
                 else:
                     if player.num_buys > 0:
                         # Play all coins at once
-                        if play_coins_rect.collidepoint(mouse_pos):
+                        if coins_button.rect.collidepoint(mouse_pos):
                             player.play_all_coins()
                             
                         # Play coins individually
@@ -214,7 +214,7 @@ def blit_hands(screen, players):
             player.x += card.rect.width
                 
 
-def update_screen(screen, background_color, treasure_cards, victory_cards, action_cards, supply_piles, players, done_image, done_rect, play_coins_image, play_coins_rect):
+def update_screen(screen, background_color, treasure_cards, victory_cards, action_cards, supply_piles, players, done_button, coins_button):
     """Update images on the screen and flip to the new screen."""
     # Draws background, supply piles, hands, and buttons on screen
     screen.fill(background_color)
@@ -222,8 +222,8 @@ def update_screen(screen, background_color, treasure_cards, victory_cards, actio
     blit_victory_piles(screen, victory_cards, supply_piles)
     blit_action_piles(screen, action_cards, supply_piles)
     blit_hands(screen, players)
-    screen.blit(done_image, done_rect)
-    screen.blit(play_coins_image, play_coins_rect)
+    done_button.draw_button()
+    coins_button.draw_button()
     
     # Makes the most recently drawn screen visible
     pygame.display.flip()

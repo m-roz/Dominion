@@ -1,6 +1,7 @@
 import pygame
 
 from player import Player
+from button import Button
 import card
 import game_functions as gf
 
@@ -66,25 +67,10 @@ supply_piles.update(action_piles)
 
 
 # Done button
-msg = "Done"
-msg_color = (255, 255, 255)
-bg_color = (0, 0, 0)
-f = pygame.font.SysFont(None, 48)
-done_image = f.render(msg, True, msg_color, bg_color)
-done_rect = done_image.get_rect()
-done_rect.x = 1300
-done_rect.y = 160
+done_button = Button("Done", screen, (1300,160))
 
 # Coins button
-msg2 = "+$" #+ str(player.get_num_coins_in_hand())
-msg_color = (255, 255, 255)
-bg_color = (0, 0, 0)
-f = pygame.font.SysFont(None, 48)
-play_coins_image = f.render(msg2, True, msg_color, bg_color)
-play_coins_rect = play_coins_image.get_rect()
-play_coins_rect.x = 1200
-play_coins_rect.y = 160
-
+coins_button = Button("+$", screen, (1200,160))
 
 # Create players
 player1 = Player('Player1')
@@ -110,8 +96,7 @@ player2.y = 3*copper.rect.height
 while not game_over:
     for player in players:
         gf.update_screen(screen, background_color, treasure_cards, 
-                        victory_cards, action_cards, supply_piles, players, done_image, 
-                        done_rect, play_coins_image, play_coins_rect)
+                        victory_cards, action_cards, supply_piles, players, done_button, coins_button)
                         
         # Start turn
         player.turn += 1
@@ -138,18 +123,13 @@ while not game_over:
             
             # Run event loop and check for mouse events
             gf.check_events(player, cards, supply_piles,
-                done_rect, play_coins_rect)
+                done_button, coins_button)
             
-            # Update play_coins box. 
-            msg2 = "+$"+ str(player.get_num_coins_in_hand())
-            play_coins_image = f.render(msg2, True, msg_color, bg_color)
-            play_coins_rect = play_coins_image.get_rect()
-            play_coins_rect.x = 1200
-            play_coins_rect.y = 160
+            # Update coins button 
+            coins_button.prep_msg("+$"+ str(player.get_num_coins_in_hand()))
             
             gf.update_screen(screen, background_color, treasure_cards,
-                            victory_cards, action_cards, supply_piles, players, done_image, 
-                            done_rect, play_coins_image, play_coins_rect)
+                            victory_cards, action_cards, supply_piles, players, done_button, coins_button)
                     
 
         # Check for game over.
