@@ -45,6 +45,7 @@ class Player():
             print(self.name, "draws a", new_card.name)
 
         # Sort hand by type and cost.
+        # Order: Action cards, treasure cards, victory cards in descending cost
         def get_cost(card):
             return card.cost
         

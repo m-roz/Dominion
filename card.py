@@ -8,23 +8,19 @@ class Card():
         self.cost = cost
         self.image = pygame.image.load("Images/" + self.name + ".jpg")
         self.rect = self.image.get_rect()
+        self.supply_rect = self.image.get_rect()
         
 class TreasureCard(Card):
     def __init__(self, name, cost, value):
         super().__init__(name, cost)
         self.type = 'Treasure'
         self.value = value
-        self.image = pygame.image.load("Images/" + self.name + ".jpg")
-        self.rect = self.image.get_rect()
 
 class VictoryCard(Card):
     def __init__(self, name, cost, point_value):
-        super().__init__(name, cost)
+        super().__init__(name, cost,)
         self.type = 'Victory'
         self.point_value = point_value
-        self.image = pygame.image.load("Images/" + self.name + ".jpg")
-        self.rect = self.image.get_rect()
-
 
 # Even though technically a curse type, might be unnecessary to create a 
 # seperate class. 
@@ -32,9 +28,6 @@ class CurseCard(VictoryCard):
     def __init__(self, name, cost, point_value):
         super().__init__(name, cost, point_value)
         self.type = 'Curse'
-        self.image = pygame.image.load("Images/" + self.name + ".jpg")
-        self.rect = self.image.get_rect()
-
 
 # Create seperate classes for +actions, +$, and +buys?
 # Move to player class?
@@ -42,8 +35,6 @@ class ActionCard(Card):
     def __init__(self, name, cost):
         super().__init__(name, cost)
         self.type = 'Action'
-        self.image = pygame.image.load("Images/" + self.name + ".jpg")
-        self.rect = self.image.get_rect()
     
     # Card effects should be resolved in turn order.
     def play_action(self, player):

@@ -44,7 +44,7 @@ def check_events(player, cards, supply_piles, done_button, coins_button):
                                     
                         # Buy cards
                         for card in cards:
-                            if card.rect.collidepoint(mouse_pos):
+                            if card.supply_rect.collidepoint(mouse_pos):
                                 player.buy_card(card, supply_piles)
                                 
             # Print info after each click
@@ -59,8 +59,6 @@ def print_game_info(player, supply_piles):
     print("$", player.num_coins, "\n")
     # Number of cards in deck should only be visible to player.
     print("Deck:", len(player.deck), "cards \n")
-    for supply_pile in supply_piles:
-        print(supply_pile,":", supply_piles[supply_pile])
 
     # ~ # Use to check that cards go where they need to
     # ~ print("hand:",player.hand)
@@ -132,63 +130,42 @@ def determine_winner(players):
     # Prints players and scores in order of victory
     for player in players:
         print(player.name, "has", player.victory_points, "victory points")
-
-
-def blit_treasure_piles(screen, treasure_cards, supply_piles):
-    """Draw treasure piles on screen."""
-    y_location = 0
-    for card in treasure_cards:
-        card.rect.x = 0
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height + 24
         
-        font = pygame.font.SysFont(None, 24)
-        text_color = (0, 0, 0)
-        name_str = card.name
-        cost_str = " $" + str(card.cost)
-        quantity_str = " (" + str(supply_piles[name_str]) + ")"
-        info_str = name_str + cost_str + quantity_str
-        
-        name_image = font.render(info_str, True, text_color)
-        name_rect = name_image.get_rect()
-        name_rect.center = card.rect.center
-        name_rect.top = card.rect.bottom + 2
-        screen.blit(name_image, name_rect)
-    
-def blit_victory_piles(screen, victory_cards, supply_piles):
-    """Draw victory piles on screen."""
-    y_location = 0
-    for card in victory_cards:
-        card.rect.x = card.rect.width + 20
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height + 24
-
-        font = pygame.font.SysFont(None, 24)
-        text_color = (0, 0, 0)
-        name_str = card.name
-        cost_str = " $" + str(card.cost)
-        quantity_str = " (" + str(supply_piles[name_str]) + ")"
-        info_str = name_str + cost_str + quantity_str
-        
-        name_image = font.render(info_str, True, text_color)
-        name_rect = name_image.get_rect()
-        name_rect.center = card.rect.center
-        name_rect.top = card.rect.bottom + 2
-        screen.blit(name_image, name_rect)
-    
-def blit_action_piles(screen, action_cards, supply_piles):
-    """Draw action piles on screen."""
+def prep_supply_piles(treasure_cards, victory_cards, action_cards):
+    """Prepare supply pile rects to be blitted. Only done once at the start."""   
+    # Treasure piles
     y_location = 0
     for card in action_cards:
-        card.rect.x = 2*card.rect.width + 40
-        card.rect.y = y_location
-        screen.blit(card.image, card.rect)
-        y_location += card.rect.height + 24
+        card.supply_rect.x = 2*card.supply_rect.width + 40
+        card.supply_rect.y = y_location
+        y_location += card.supply_rect.height + 24
+     
+    # Victory piles
+    y_location = 0
+    for card in treasure_cards:
+        card.supply_rect.x = 0
+        card.supply_rect.y = y_location
+        y_location += card.supply_rect.height + 24
         
-        font = pygame.font.SysFont(None, 24)
-        text_color = (0, 0, 0)
+    # Action piles
+    y_location = 0
+    for card in victory_cards:
+        card.supply_rect.x = card.supply_rect.width + 20
+        card.supply_rect.y = y_location
+        y_location += card.supply_rect.height + 24
+
+    
+
+def blit_supply_piles(screen, treasure_cards, victory_cards, action_cards, supply_piles):
+    """Draw supply piles with names, costs, and quantities on screen."""
+    
+    font = pygame.font.SysFont(None, 24)
+    text_color = (0, 0, 0)
+    
+    # Treasure piles
+    for card in action_cards:
+        screen.blit(card.image, card.supply_rect)
+        
         name_str = card.name
         cost_str = " $" + str(card.cost)
         quantity_str = " (" + str(supply_piles[name_str]) + ")"
@@ -196,8 +173,39 @@ def blit_action_piles(screen, action_cards, supply_piles):
         
         name_image = font.render(info_str, True, text_color)
         name_rect = name_image.get_rect()
-        name_rect.center = card.rect.center
-        name_rect.top = card.rect.bottom + 2
+        name_rect.center = card.supply_rect.center
+        name_rect.top = card.supply_rect.bottom + 2
+        screen.blit(name_image, name_rect)
+        
+    # Victory piles
+    for card in treasure_cards:
+        screen.blit(card.image, card.supply_rect)
+        
+        name_str = card.name
+        cost_str = " $" + str(card.cost)
+        quantity_str = " (" + str(supply_piles[name_str]) + ")"
+        info_str = name_str + cost_str + quantity_str
+        
+        name_image = font.render(info_str, True, text_color)
+        name_rect = name_image.get_rect()
+        name_rect.center = card.supply_rect.center
+        name_rect.top = card.supply_rect.bottom + 2
+        screen.blit(name_image, name_rect)
+
+        
+    # Action piles
+    for card in victory_cards:
+        screen.blit(card.image, card.supply_rect)
+
+        name_str = card.name
+        cost_str = " $" + str(card.cost)
+        quantity_str = " (" + str(supply_piles[name_str]) + ")"
+        info_str = name_str + cost_str + quantity_str
+        
+        name_image = font.render(info_str, True, text_color)
+        name_rect = name_image.get_rect()
+        name_rect.center = card.supply_rect.center
+        name_rect.top = card.supply_rect.bottom + 2
         screen.blit(name_image, name_rect)
     
 def blit_hands(screen, players):
@@ -218,9 +226,7 @@ def update_screen(screen, background_color, treasure_cards, victory_cards, actio
     """Update images on the screen and flip to the new screen."""
     # Draws background, supply piles, hands, and buttons on screen
     screen.fill(background_color)
-    blit_treasure_piles(screen, treasure_cards, supply_piles)
-    blit_victory_piles(screen, victory_cards, supply_piles)
-    blit_action_piles(screen, action_cards, supply_piles)
+    blit_supply_piles(screen, treasure_cards, victory_cards, action_cards, supply_piles)
     blit_hands(screen, players)
     done_button.draw_button()
     coins_button.draw_button()

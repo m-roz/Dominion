@@ -65,6 +65,8 @@ supply_piles = treasure_piles.copy()
 supply_piles.update(victory_piles)
 supply_piles.update(action_piles)
 
+# Prepare supply piles to be blitted
+gf.prep_supply_piles(treasure_cards, victory_cards, action_cards)
 
 # Done button
 done_button = Button("Done", screen, (1300,160))
@@ -89,8 +91,9 @@ trash_pile = []
 
 game_over = False
 
-player1.y = copper.rect.height
-player2.y = 3*copper.rect.height
+# Hand locations
+player1.y = copper.supply_rect.height
+player2.y = 3*copper.supply_rect.height
 
 # Main loop
 while not game_over:
