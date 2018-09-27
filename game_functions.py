@@ -29,9 +29,11 @@ def check_events(screen, background_color, coins_button, done_button, cards, sup
                                     player.num_actions -= 1
                                     player.hand.remove(card)
                                     player.played_cards.append(card)
+                                    
+                                    # done indicates when card action ends
                                     done = False
                                     if card.name == 'Cellar':
-                                        player.num_actions += 1
+                                        player.plus_actions(1)
                                         # Discard cards
                                         print("Discard cards:")
                                         num = 0
@@ -54,8 +56,7 @@ def check_events(screen, background_color, coins_button, done_button, cards, sup
                                         done = True
                                     elif card.name == 'Village':
                                         player.draw(1)
-                                        player.num_actions += 1
-                                        print("+1 Actions")
+                                        player.plus_actions(1)
                                         done = True
                                     elif card.name == 'Workshop':
                                         print("Gain a card:")
@@ -71,10 +72,8 @@ def check_events(screen, background_color, coins_button, done_button, cards, sup
                                                                 done = True
                                             update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
                                     elif card.name == 'Woodcutter':
-                                        player.num_buys +=1
-                                        player.num_coins += 2  
-                                        print("+1 Buys")
-                                        print("+$2")
+                                        player.plus_buys(1)
+                                        player.plus_coins(2) 
                                         done = True
                                     elif card.name == 'Smithy':
                                         player.draw(3)
@@ -102,7 +101,7 @@ def check_events(screen, background_color, coins_button, done_button, cards, sup
                                                                                     done = True
                                                                     update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
                                     elif card.name == 'Militia':
-                                        player.num_coins +=2
+                                        player.plus_coins(2)
                                         # Resolve in turn order
                                         target_players = players[players.index(player)+1:] + players[0:players.index(player)]
                                         
@@ -125,37 +124,38 @@ def check_events(screen, background_color, coins_button, done_button, cards, sup
                                             
                                     elif card.name == 'Market':
                                         player.draw(1)
-                                        player.num_actions += 1
-                                        player.num_buys += 1
-                                        player.num_coins += 1
-                                        print("+1 Actions")
-                                        print("+1 Buys")
-                                        print("+$1")
+                                        player.plus_actions(1)
+                                        player.plus_buys(1)
+                                        player.plus_coins(1)
                                         done = True
                                     elif card.name == 'Mine':
-                                        print("Trash a card:")
-                                        while not done:
-                                            # Get mouse position
-                                            mouse_pos = pygame.mouse.get_pos()
-                                            for event in pygame.event.get():
-                                                if event.type == pygame.MOUSEBUTTONDOWN:
-                                                    for hand_card, hand_card_rect in zip(player.hand, player.hand_rects):
-                                                        if hand_card_rect.collidepoint(mouse_pos):
-                                                            if hand_card.type == 'Treasure':
-                                                                player.trash_card(hand_card, trash_pile)
-                                                                print("Gain a card:")
-                                                                update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
-                                                                while not done:
-                                                                    # Get mouse position
-                                                                    mouse_pos = pygame.mouse.get_pos()
-                                                                    for event in pygame.event.get():
-                                                                        if event.type == pygame.MOUSEBUTTONDOWN:
-                                                                            for card in cards:
-                                                                                if card.supply_rect.collidepoint(mouse_pos):
-                                                                                    if card.type == 'Treasure' and card.cost <= hand_card.cost + 3 and supply_piles[card.name] != 0:
-                                                                                        player.gain_card(card, supply_piles, True)
-                                                                                        done = True
-                                                update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                        if 'Treasure' not in [card.type for card in player.hand]:
+                                            print("No treasure cards in hand.")
+                                            done = True
+                                        else:
+                                            print("Trash a card:")
+                                            while not done:
+                                                # Get mouse position
+                                                mouse_pos = pygame.mouse.get_pos()
+                                                for event in pygame.event.get():
+                                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                                        for hand_card, hand_card_rect in zip(player.hand, player.hand_rects):
+                                                            if hand_card_rect.collidepoint(mouse_pos):
+                                                                if hand_card.type == 'Treasure':
+                                                                    player.trash_card(hand_card, trash_pile)
+                                                                    print("Gain a card:")
+                                                                    update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                                                    while not done:
+                                                                        # Get mouse position
+                                                                        mouse_pos = pygame.mouse.get_pos()
+                                                                        for event in pygame.event.get():
+                                                                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                                                                for card in cards:
+                                                                                    if card.supply_rect.collidepoint(mouse_pos):
+                                                                                        if card.type == 'Treasure' and card.cost <= hand_card.cost + 3 and supply_piles[card.name] != 0:
+                                                                                            player.gain_card(card, supply_piles, True)
+                                                                                            done = True
+                                                    update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
             else:
                 if done_button.rect.collidepoint(mouse_pos):
                     player.buy_phase = False

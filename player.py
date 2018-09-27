@@ -128,3 +128,18 @@ class Player():
         for card in self.hand[:]:
             if card.type == 'Treasure':
                 self.play_coin(card)
+
+    def plus_actions(self, num):
+        """Increases number of actions player has for current turn."""
+        self.num_actions += num
+        print("+" + str(num) + " Actions")
+            
+    def plus_buys(self, num):
+        """Increases number of buys player has for current turn."""
+        self.num_buys += num
+        print("+" + str(num) + " Buys")
+        
+    def plus_coins(self, num):
+        """Increases number of coins player has for current turn."""
+        self.num_coins += num
+        print("+$" + str(num))

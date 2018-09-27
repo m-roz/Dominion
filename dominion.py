@@ -7,7 +7,7 @@ from button import Button
 
 pygame.init()
 
-# Indicate number of players
+# Select number of players
 num_players = 3
 
 
