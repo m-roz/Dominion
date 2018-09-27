@@ -1,11 +1,11 @@
 import sys
-
 import pygame
 
-from player import Player 
-
-def check_events(player, cards, supply_piles, done_button, coins_button):
+def check_events(screen, background_color, coins_button, done_button, cards, supply_piles, trash_pile, player, players):
     """Respond to mouse events."""
+    
+    # Very Messy
+    
     # Get mouse position
     mouse_pos = pygame.mouse.get_pos()
     # Respond to mouse clicks
@@ -24,7 +24,138 @@ def check_events(player, cards, supply_piles, done_button, coins_button):
                         player.hand, player.hand_rects):
                             if card_rect.collidepoint(mouse_pos):
                                 if card.type == 'Action':
-                                    card.play_action(player)
+                                    # Card effects resolved in turn order
+                                    print(player.name, "plays a", card.name)
+                                    player.num_actions -= 1
+                                    player.hand.remove(card)
+                                    player.played_cards.append(card)
+                                    done = False
+                                    if card.name == 'Cellar':
+                                        player.num_actions += 1
+                                        # Discard cards
+                                        print("Discard cards:")
+                                        num = 0
+                                        while not done:
+                                            # Get mouse position
+                                            mouse_pos = pygame.mouse.get_pos()
+                                            for event in pygame.event.get():
+                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                    for card, card_rect in zip(player.hand, player.hand_rects):
+                                                        if card_rect.collidepoint(mouse_pos):
+                                                            player.discard_card(card)
+                                                            num += 1
+                                                    if done_button.rect.collidepoint(mouse_pos) or len(player.hand) == 0:
+                                                        done = True
+                                                update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                        # Draw cards
+                                        player.draw(num)
+                                    elif card.name == 'Moat':
+                                        player.draw(2)
+                                        done = True
+                                    elif card.name == 'Village':
+                                        player.draw(1)
+                                        player.num_actions += 1
+                                        print("+1 Actions")
+                                        done = True
+                                    elif card.name == 'Workshop':
+                                        print("Gain a card:")
+                                        while not done:
+                                            # Get mouse position
+                                            mouse_pos = pygame.mouse.get_pos()
+                                            for event in pygame.event.get():
+                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                    for card in cards:
+                                                        if card.supply_rect.collidepoint(mouse_pos):
+                                                            if card.cost <= 4 and supply_piles[card.name] != 0:
+                                                                player.gain_card(card, supply_piles)
+                                                                done = True
+                                            update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                    elif card.name == 'Woodcutter':
+                                        player.num_buys +=1
+                                        player.num_coins += 2  
+                                        print("+1 Buys")
+                                        print("+$2")
+                                        done = True
+                                    elif card.name == 'Smithy':
+                                        player.draw(3)
+                                        done = True
+                                    elif card.name == 'Remodel':
+                                        print("Trash a card:")
+                                        while not done:
+                                            # Get mouse position
+                                            mouse_pos = pygame.mouse.get_pos()
+                                            for event in pygame.event.get():
+                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                    for hand_card, hand_card_rect in zip(player.hand, player.hand_rects):
+                                                        if hand_card_rect.collidepoint(mouse_pos):
+                                                            player.trash_card(hand_card, trash_pile)
+                                                            print("Gain a card:")
+                                                            while not done:
+                                                                # Get mouse position
+                                                                mouse_pos = pygame.mouse.get_pos()
+                                                                for event in pygame.event.get():
+                                                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                                                        for card in cards:
+                                                                            if card.supply_rect.collidepoint(mouse_pos):
+                                                                                if card.cost <= hand_card.cost + 2 and supply_piles[card.name] != 0:
+                                                                                    player.gain_card(card, supply_piles)
+                                                                                    done = True
+                                                                    update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                    elif card.name == 'Militia':
+                                        player.num_coins +=2
+                                        # Resolve in turn order
+                                        target_players = players[players.index(player)+1:] + players[0:players.index(player)]
+                                        
+                                        for player in target_players:
+                                            update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                            if 'Moat' in [card.name for card in player.hand]:
+                                                print(player.name, "reveals a moat.")
+                                            else:
+                                                print(player.name, "discard down to 3 cards:")
+                                                while len(player.hand) > 3:
+                                                    # Get mouse position
+                                                    mouse_pos = pygame.mouse.get_pos()
+                                                    for event in pygame.event.get():
+                                                        if event.type == pygame.MOUSEBUTTONDOWN:
+                                                            for hand_card, hand_card_rect in zip(player.hand, player.hand_rects):
+                                                                if hand_card_rect.collidepoint(mouse_pos):
+                                                                    player.discard_card(hand_card)
+                                                                    update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                        done = True
+                                            
+                                    elif card.name == 'Market':
+                                        player.draw(1)
+                                        player.num_actions += 1
+                                        player.num_buys += 1
+                                        player.num_coins += 1
+                                        print("+1 Actions")
+                                        print("+1 Buys")
+                                        print("+$1")
+                                        done = True
+                                    elif card.name == 'Mine':
+                                        print("Trash a card:")
+                                        while not done:
+                                            # Get mouse position
+                                            mouse_pos = pygame.mouse.get_pos()
+                                            for event in pygame.event.get():
+                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                    for hand_card, hand_card_rect in zip(player.hand, player.hand_rects):
+                                                        if hand_card_rect.collidepoint(mouse_pos):
+                                                            if hand_card.type == 'Treasure':
+                                                                player.trash_card(hand_card, trash_pile)
+                                                                print("Gain a card:")
+                                                                update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
+                                                                while not done:
+                                                                    # Get mouse position
+                                                                    mouse_pos = pygame.mouse.get_pos()
+                                                                    for event in pygame.event.get():
+                                                                        if event.type == pygame.MOUSEBUTTONDOWN:
+                                                                            for card in cards:
+                                                                                if card.supply_rect.collidepoint(mouse_pos):
+                                                                                    if card.type == 'Treasure' and card.cost <= hand_card.cost + 3 and supply_piles[card.name] != 0:
+                                                                                        player.gain_card(card, supply_piles, True)
+                                                                                        done = True
+                                                update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
             else:
                 if done_button.rect.collidepoint(mouse_pos):
                     player.buy_phase = False
@@ -46,157 +177,49 @@ def check_events(player, cards, supply_piles, done_button, coins_button):
                         for card in cards:
                             if card.supply_rect.collidepoint(mouse_pos):
                                 player.buy_card(card, supply_piles)
-                                
-            # Print info after each click
-            print_game_info(player, supply_piles)
 
+def prep_buttons(player, coins_button, done_button):
+    """Updates coins and done buttons."""
+    # Update coins button 
+    coins_button.prep("+$"+ str(player.get_num_coins_in_hand()), 
+        (1200, player.y + 90))
+    # Update done button location
+    done_button.prep("Done", (1300, player.y + 90))
 
-def print_game_info(player, supply_piles):
-    """Prints relevant game info for current player."""
-    print("\n", player.name, "\n")
-    print("Actions:", player.num_actions)
-    print("Buys:", player.num_buys)
-    print("$", player.num_coins, "\n")
-    # Number of cards in deck should only be visible to player.
-    print("Deck:", len(player.deck), "cards \n")
-
-    # ~ # Use to check that cards go where they need to
-    # ~ print("hand:",player.hand)
-    # ~ print("deck:",player.deck)
-    # ~ print("discard pile:",player.discard_pile)
-    # ~ print("played_cards:",player.played_cards)
-
-
-def check_game_over(supply_piles):
-    """Check for game over."""
-    # Game ends when either the supply pile of province cards is empty or
-    # any 3 supply piles are empty.
-    
-    # Needs a better way to keep track of empty piles
-    # instead of reseting every check. 
-    num_empty_piles = 0
-    for pile in supply_piles.values():
-        if pile == 0:
-            num_empty_piles += 1
-  
-    if num_empty_piles >= 3 or supply_piles['Province'] == 0:
-        game_over = True
-    else:
-        game_over = False
-    
-    return game_over
-
-
-def determine_winner(players):
-    """Determine winner at the end of the game."""
-    for player in players:
-        # Counts victory points in each player's deck
-        player.deck.extend(player.discard_pile + player.hand)
-        player.hand = []
-        player.discard_pile = []
-        for card in player.deck:
-            if card.type == 'Victory' or card.type == 'Curse':
-                player.victory_points += card.point_value
-        
-        # Sorts players by most victory points and fewest turns
-        def get_turns(player):
-            return player.turn
-        def get_victory_points(player):
-            return player.victory_points
-        players.sort(key=get_turns)
-        players.sort(key=get_victory_points, reverse=True)
-        
-        # If multiple players share the highest score and fewest turns
-        scores = list(player.victory_points for player in players)
-        max_score = max(scores)
-        count = scores.count(max_score)
-        if count > 1:
-            tied_players = players[0:count]
-            turns = list(player.turn for player in tied_players)
-            min_turns = min(turns)
-            count = turns.count(min_turns)
-            if count > 1:
-                tied_players = tied_players[0:count]
-        
-        winner = players[0]
-    
-    if count > 1:
-        # If tie
-        print("Tie game", list(player.name for player in tied_players))
-    else:
-        # If single winner
-        print(winner.name, "is the winner!")
-        
-    # Prints players and scores in order of victory
-    for player in players:
-        print(player.name, "has", player.victory_points, "victory points")
-        
 def prep_supply_piles(treasure_cards, victory_cards, action_cards):
     """Prepare supply pile rects to be blitted. Only done once at the start."""   
     # Treasure piles
-    y_location = 0
-    for card in action_cards:
-        card.supply_rect.x = 2*card.supply_rect.width + 40
-        card.supply_rect.y = y_location
-        y_location += card.supply_rect.height + 24
-     
-    # Victory piles
     y_location = 0
     for card in treasure_cards:
         card.supply_rect.x = 0
         card.supply_rect.y = y_location
         y_location += card.supply_rect.height + 24
-        
-    # Action piles
+     
+    # Victory piles
     y_location = 0
     for card in victory_cards:
         card.supply_rect.x = card.supply_rect.width + 20
         card.supply_rect.y = y_location
         y_location += card.supply_rect.height + 24
+       
+    # Action piles
+    y_location = 0 
+    for card in action_cards:
+        card.supply_rect.x = 2*card.supply_rect.width + 40
+        card.supply_rect.y = y_location
+        y_location += card.supply_rect.height + 24
 
     
 
-def blit_supply_piles(screen, treasure_cards, victory_cards, action_cards, supply_piles):
+def blit_supply_piles(screen, cards, supply_piles):
     """Draw supply piles with names, costs, and quantities on screen."""
     
     font = pygame.font.SysFont(None, 24)
     text_color = (0, 0, 0)
     
-    # Treasure piles
-    for card in action_cards:
+    for card in cards:
         screen.blit(card.image, card.supply_rect)
         
-        name_str = card.name
-        cost_str = " $" + str(card.cost)
-        quantity_str = " (" + str(supply_piles[name_str]) + ")"
-        info_str = name_str + cost_str + quantity_str
-        
-        name_image = font.render(info_str, True, text_color)
-        name_rect = name_image.get_rect()
-        name_rect.center = card.supply_rect.center
-        name_rect.top = card.supply_rect.bottom + 2
-        screen.blit(name_image, name_rect)
-        
-    # Victory piles
-    for card in treasure_cards:
-        screen.blit(card.image, card.supply_rect)
-        
-        name_str = card.name
-        cost_str = " $" + str(card.cost)
-        quantity_str = " (" + str(supply_piles[name_str]) + ")"
-        info_str = name_str + cost_str + quantity_str
-        
-        name_image = font.render(info_str, True, text_color)
-        name_rect = name_image.get_rect()
-        name_rect.center = card.supply_rect.center
-        name_rect.top = card.supply_rect.bottom + 2
-        screen.blit(name_image, name_rect)
-
-        
-    # Action piles
-    for card in victory_cards:
-        screen.blit(card.image, card.supply_rect)
-
         name_str = card.name
         cost_str = " $" + str(card.cost)
         quantity_str = " (" + str(supply_piles[name_str]) + ")"
@@ -220,16 +243,116 @@ def blit_hands(screen, players):
             player.hand_rects.append(hand_rect)
             screen.blit(card.image, hand_rect)
             player.x += card.rect.width
-                
 
-def update_screen(screen, background_color, treasure_cards, victory_cards, action_cards, supply_piles, players, done_button, coins_button):
+def blit_turn_info(screen, player):
+    """Draw turn info for current player on screen."""
+    font = pygame.font.SysFont(None, 24)
+    text_color = (0, 0, 0)
+    
+    name_str = player.name
+    # -> indicates current phase
+    if player.action_phase:
+        num_actions_str = "->Actions: " + str(player.num_actions)
+    else:
+        num_actions_str = "  Actions: " + str(player.num_actions)
+    if player.buy_phase:
+        num_buys_str = "->Buys: " + str(player.num_buys)
+    else:
+        num_buys_str = "  Buys: " + str(player.num_buys)
+    num_coins_str = "  To Spend: $" + str(player.num_coins)
+    
+    name_image = font.render(name_str, True, text_color)
+    name_rect = name_image.get_rect()
+    name_rect.x = 450
+    name_rect.y = player.y
+    num_actions_image = font.render(num_actions_str, True, text_color)
+    num_actions_rect = num_actions_image.get_rect()
+    num_actions_rect.x = 450
+    num_actions_rect.y = name_rect.bottom
+    num_buys_image = font.render(num_buys_str, True, text_color)
+    num_buys_rect = num_buys_image.get_rect()
+    num_buys_rect.x = 450
+    num_buys_rect.y = num_actions_rect.bottom
+    num_coins_image = font.render(num_coins_str, True, text_color)
+    num_coins_rect = num_coins_image.get_rect()
+    num_coins_rect.x = 450
+    num_coins_rect.y = num_buys_rect.bottom
+    
+    screen.blit(name_image, name_rect)
+    screen.blit(num_actions_image, num_actions_rect)
+    screen.blit(num_buys_image, num_buys_rect)
+    screen.blit(num_coins_image, num_coins_rect)
+    
+    
+
+def update_screen(screen, background_color, cards, supply_piles, 
+        player, players, done_button, coins_button):
     """Update images on the screen and flip to the new screen."""
     # Draws background, supply piles, hands, and buttons on screen
     screen.fill(background_color)
-    blit_supply_piles(screen, treasure_cards, victory_cards, action_cards, supply_piles)
+    blit_supply_piles(screen, cards, supply_piles)
     blit_hands(screen, players)
-    done_button.draw_button()
-    coins_button.draw_button()
-    
+    done_button.draw()
+    coins_button.draw()
+    blit_turn_info(screen, player)
     # Makes the most recently drawn screen visible
     pygame.display.flip()
+
+def check_game_over(supply_piles):
+    """Check for game over."""
+    # Game ends when either the supply pile of province cards is empty or
+    # any other 3 supply piles are empty
+    
+    num_empty_piles = len([i for i in supply_piles.values() if i == 0])
+
+    if num_empty_piles >= 3 or supply_piles['Province'] == 0:
+        game_over = True
+    else:
+        game_over = False
+    
+    return game_over
+
+def determine_winner(players):
+    """Determine winner at the end of the game and prints results."""
+    for player in players:
+        # Counts victory points in each player's deck
+        player.deck.extend(player.discard_pile + player.hand)
+        player.hand = []
+        player.discard_pile = []
+        for card in player.deck:
+            if card.type == 'Victory' or card.type == 'Curse':
+                player.victory_points += card.point_value
+        
+        # Sort players by most victory points and fewest turns
+        def get_turns(player):
+            return player.turn
+        def get_victory_points(player):
+            return player.victory_points
+        players.sort(key=get_turns)
+        players.sort(key=get_victory_points, reverse=True)
+        
+        # If multiple players share the highest score and
+        # took the same number of turns
+        scores = list(player.victory_points for player in players)
+        max_score = max(scores)
+        count = scores.count(max_score)
+        if count > 1:
+            tied_players = players[0:count]
+            turns = list(player.turn for player in tied_players)
+            min_turns = min(turns)
+            count = turns.count(min_turns)
+            if count > 1:
+                tied_players = tied_players[0:count]
+        
+        winner = players[0]
+    
+    if count > 1:
+        # If tie
+        print("Tie game", list(player.name for player in tied_players))
+    else:
+        # If single winner
+        print(winner.name, "is the winner!")
+        
+    # Prints players and scores in order of victory
+    for player in players:
+        print(player.name, "has", player.victory_points, "victory points")

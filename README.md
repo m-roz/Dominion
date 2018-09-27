@@ -1,15 +1,13 @@
 # Dominion
 Dominion prototype using pygame.
-Currently plays a game with 2 players sharing the same screen with both hands always visible.
-Each player shares the same '+$' and 'Done' buttons.
-Click the 'Done' button to end the action phase and start the buy phase or end the buy phase and turn for the current player.
+Currently plays a game with 2-4 players sharing the same screen with each player's hand always visible.
+Uses the starting "first game" kingdom cards from dominion rulebook.
+All card images taken from isotropic dominion.
 
-Uses the starting "first game" kingdom cards from dominion rulebook. All card images drawn on screen but currently only village, woodcutter, smithy, and market work.
-All information regarding the active player and supply piles is printed to the console after every click. 
+To play, run Dominion.py
+Click the 'Done' button to end the current phase.
+Action, buy, and victory information printed to the console. 
 
-Should be able to finish a game with just the 4 working action cards.
-
-To play, launch Dominion.py
 
 Changelog:
 Commit 1
@@ -36,3 +34,10 @@ Commit 6
 
 Commit 7
 -Moved code to update screen into game_functions.py
+
+Commit 9/26/18
+-Supply pile information displayed on screen
+-All 10 action cards work
+-Number of players can be changed
+
+check_events() function in game_functions.py module currently very messy and needs to be refactored

@@ -1,11 +1,15 @@
 import pygame
 
-from player import Player
-from button import Button
 import card
 import game_functions as gf
+from player import Player
+from button import Button
 
 pygame.init()
+
+# Indicate number of players
+num_players = 3
+
 
 # Screen
 screen_dimensions = (1920,1080)
@@ -14,7 +18,6 @@ pygame.display.set_caption('Dominion')
 screen_rect = screen.get_rect()
 background_color = (255, 255, 255)
 
-
 # Treasure cards
 copper = card.TreasureCard('Copper', 0, 1)
 silver = card.TreasureCard('Silver', 3, 2)
@@ -22,7 +25,7 @@ gold = card.TreasureCard('Gold', 6, 3)
 
 # Number of cards in supply piles based on number of players
 treasure_cards = [copper, silver, gold]
-treasure_piles = {'Copper': 46, 'Silver': 40, 'Gold': 30}
+treasure_piles = {'Copper': (60-7*num_players), 'Silver': 40, 'Gold': 30}
 
 # Victory cards
 estate = card.VictoryCard('Estate', 2, 1)
@@ -36,8 +39,12 @@ curse = card.CurseCard('Curse', 0, -1)
 victory_cards = [estate, duchy, province, curse]
 victory_piles = {}
 for victory_card in victory_cards:
-    victory_piles[victory_card.name] = 8
-victory_piles['Curse'] = 10
+    if num_players == 2:
+        victory_piles[victory_card.name] = 8
+    else:
+        victory_piles[victory_card.name] = 12
+
+victory_piles['Curse'] = 10*num_players - 10
 
 
 # Action cards.
@@ -68,16 +75,22 @@ supply_piles.update(action_piles)
 # Prepare supply piles to be blitted
 gf.prep_supply_piles(treasure_cards, victory_cards, action_cards)
 
+# Create players and set hand locations on screen
+players = [] 
+y = copper.supply_rect.height
+for i in range(1, num_players+1):
+    name = "Player " + str(i)
+    player = Player(name)
+    # Hand location on screen
+    player.y = y
+    players.append(player)
+    y += 150
+
 # Done button
-done_button = Button("Done", screen, (1300,160))
+done_button = Button(screen)
 
 # Coins button
-coins_button = Button("+$", screen, (1200,160))
-
-# Create players
-player1 = Player('Player1')
-player2 = Player('Player2')
-players = [player1, player2]
+coins_button = Button(screen)
 
 # Shuffle each player's starting deck and draw a hand of 5 cards
 for player in players:
@@ -86,21 +99,13 @@ for player in players:
     player.draw(5)
     
 # Trash pile
-# Players should be able to look in trash pile
 trash_pile = []
 
 game_over = False
 
-# Hand locations
-player1.y = copper.supply_rect.height
-player2.y = 3*copper.supply_rect.height
-
 # Main loop
 while not game_over:
     for player in players:
-        gf.update_screen(screen, background_color, treasure_cards, 
-                        victory_cards, action_cards, supply_piles, players, done_button, coins_button)
-                        
         # Start turn
         player.turn += 1
         print("\n", player.name, "Turn", player.turn, "\n")
@@ -108,37 +113,35 @@ while not game_over:
         # Begin the buy phase
         player.action_phase = True
         player.buy_phase = False
-        current_phase = "Action Phase"
         
         while player.buy_phase or player.action_phase:
             if player.action_phase:
-                # Skips action phase if no action cards in hand 
+                # Skip action phase if no action cards in hand 
                 # or no action points
                 if player.hand[0].type != 'Action' or player.num_actions == 0:
                     player.action_phase = False
                     player.buy_phase = True
-                    current_phase = "Buy Phase"
             if player.buy_phase:
-                # Skips buy phase if no buy points
+                # Skip buy phase if no buy points
                 if player.num_buys == 0:
                     player.buy_phase = False
                     player.clean_up()
             
             # Run event loop and check for mouse events
-            gf.check_events(player, cards, supply_piles,
-                done_button, coins_button)
+            gf.check_events(screen, background_color, coins_button, done_button, cards, supply_piles, trash_pile, player, players)
             
-            # Update coins button 
-            coins_button.prep_msg("+$"+ str(player.get_num_coins_in_hand()))
+            # Update buttons
+            gf.prep_buttons(player, coins_button, done_button)
             
-            gf.update_screen(screen, background_color, treasure_cards,
-                            victory_cards, action_cards, supply_piles, players, done_button, coins_button)
+            # Draw new screen
+            gf.update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
                     
 
-        # Check for game over.
+        # Check for game over at the end of each turn
         game_over = gf.check_game_over(supply_piles)
         if game_over:
             break
 
+# When game over
 print("Game Over")
 gf.determine_winner(players)
