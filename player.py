@@ -1,7 +1,5 @@
 import random
 
-import card
-
 class Player():
     def __init__(self, name):
         """ Initialize player attributes."""
@@ -143,3 +141,10 @@ class Player():
         """Increases number of coins player has for current turn."""
         self.num_coins += num
         print("+$" + str(num))
+
+    def play_action(self, card):
+        """Plays an action card."""
+        print(self.name, "plays a", card.name)
+        self.num_actions -= 1
+        self.hand.remove(card)
+        self.played_cards.append(card)

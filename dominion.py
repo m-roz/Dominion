@@ -101,47 +101,53 @@ for player in players:
 # Trash pile
 trash_pile = []
 
-game_over = False
 
-# Main loop
-while not game_over:
-    for player in players:
-        # Start turn
-        player.turn += 1
-        print("\n", player.name, "Turn", player.turn, "\n")
+def main():
+    # Main game loop
+    game_over = False
+    while not game_over:
+        for player in players:
+            # Start turn
+            player.turn += 1
+            print("\n", player.name, "Turn", player.turn, "\n")
 
-        # Begin the buy phase
-        player.action_phase = True
-        player.buy_phase = False
-        
-        while player.buy_phase or player.action_phase:
-            if player.action_phase:
-                # Skip action phase if no action cards in hand 
-                # or no action points
-                if player.hand[0].type != 'Action' or player.num_actions == 0:
-                    player.action_phase = False
-                    player.buy_phase = True
-            if player.buy_phase:
-                # Skip buy phase if no buy points
-                if player.num_buys == 0:
-                    player.buy_phase = False
-                    player.clean_up()
+            # Begin the buy phase
+            player.action_phase = True
+            player.buy_phase = False
             
-            # Run event loop and check for mouse events
-            gf.check_events(screen, background_color, coins_button, done_button, cards, supply_piles, trash_pile, player, players)
-            
-            # Update buttons
-            gf.prep_buttons(player, coins_button, done_button)
-            
-            # Draw new screen
-            gf.update_screen(screen, background_color, cards, supply_piles, player, players, done_button, coins_button)
-                    
+            while player.buy_phase or player.action_phase:
+                if player.action_phase:
+                    # Skip action phase if no action cards in hand 
+                    # or no action points
+                    if player.hand[0].type != 'Action' or player.num_actions == 0:
+                        player.action_phase = False
+                        player.buy_phase = True
+                elif player.buy_phase:
+                    # Skip buy phase if no buy points
+                    if player.num_buys == 0:
+                        player.buy_phase = False
+                        player.clean_up()
+                
+                # Run event loop and check for mouse events
+                gf.check_events(screen, background_color, coins_button, 
+                    done_button, cards, supply_piles, trash_pile, 
+                    player, players)
+                
+                # Update buttons
+                gf.prep_buttons(player, coins_button, done_button)
+                
+                # Draw new screen
+                gf.update_screen(screen, background_color, cards, 
+                    supply_piles, player, players, done_button, coins_button)
+                        
 
-        # Check for game over at the end of each turn
-        game_over = gf.check_game_over(supply_piles)
-        if game_over:
-            break
+            # Check for game over at the end of each turn
+            game_over = gf.check_game_over(supply_piles)
+            if game_over:
+                break
 
-# When game over
-print("Game Over")
-gf.determine_winner(players)
+    # When game over
+    print("Game Over")
+    gf.determine_winner(players)
+    
+main()
